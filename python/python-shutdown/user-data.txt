@@ -1,0 +1,32 @@
+#cloud-config
+
+users:
+- name: cloudservice
+  uid: 2000
+
+write_files:
+- path: /etc/systemd/system/docker.service.d/override.conf
+  permissions: 0644
+  owner: root
+  content: |
+    [Service]
+    ExecStop=/usr/bin/docker stop mycloudservice
+- path: /etc/systemd/system/cloudservice.service
+  permissions: 0644
+  owner: root
+  content: |
+    [Unit]
+    Description=Start a simple docker container
+    Wants=gcr-online.target
+    After=gcr-online.target
+
+    [Service]
+    Environment="HOME=/home/cloudservice"
+    ExecStartPre=/usr/bin/docker-credential-gcr configure-docker --registries us-central1-docker.pkg.dev
+    ExecStart=/usr/bin/docker run --rm --user 2000 --name=mycloudservice --pull=always us-central1-docker.pkg.dev/test1-305123/docker-shutdown/python-shutdown
+    ExecStop=/usr/bin/docker stop mycloudservice
+    ExecStopPost=/usr/bin/docker rm mycloudservice
+
+runcmd:
+- systemctl daemon-reload
+- systemctl start cloudservice.service

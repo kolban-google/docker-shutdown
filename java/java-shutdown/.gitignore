@@ -1,0 +1,5 @@
+# Ignore the MVN builds
+target
+
+# Ignore any Intellij configurations
+.idea

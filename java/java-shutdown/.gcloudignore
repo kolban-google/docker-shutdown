@@ -1,0 +1,6 @@
+/*
+!/target
+/target/*
+!/target/java-shutdown-1.0.jar
+!Dockerfile
+!pom.xml
